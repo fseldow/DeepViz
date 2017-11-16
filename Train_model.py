@@ -1,15 +1,13 @@
 #
 from __future__ import print_function
-from keras.models import Sequential
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tr
-from keras.models import Model
+from keras.models import Model,optimizers,Sequential
 from keras.layers import Dense, Input,BatchNormalization,Dropout,ActivityRegularization,LeakyReLU
 from keras.callbacks import EarlyStopping
 from buildData import constructData
 from buildData import constructDataWithConstraints
-from keras.models import optimizers
 from buildData import constructDataMAE
 from mpl_toolkits.mplot3d import Axes3D
 import os

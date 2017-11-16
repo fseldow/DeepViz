@@ -15,7 +15,7 @@ import config
 
 dim=config.dim
 step=0.1
-#step=10
+
 opt_echos=10000
 N_test=10000
 
@@ -27,6 +27,15 @@ x_pre=1000*np.random.rand(dim,1)
 encoder=load_model('my_encoder_3.h5')
 decoder=load_model('my_decoder_3.h5')
 model=load_model('my_model_3.h5')
+real_decoder=load_model('real_decoder_3.h5')
+
+
+
+#try to get starting point I want
+z_start=[[-30],[-30]]
+x_pre=np.transpose(real_decoder.predict(addInput(z_start)))
+print('starting point',x_pre)
+
 
 trace=gradientDescent(opt_echos,A,y,x_pre,encoder,model,step)
 
