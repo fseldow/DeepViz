@@ -8,8 +8,19 @@ def readA_y(dim):
     y=npzfile['arr_1']
     return (A,y)
 
+def read_a_y(dim):
+    outfile = './dim_parameter/ay_para_'+str(dim)+'.npz'
+    npzfile = np.load(outfile)
+    a=npzfile['arr_0']
+    y=npzfile['arr_1']
+    return (a,y)
 
 def constructData(lim1,N,dim=3):
+    [X_train, fnn]=nonconvex_absolute(lim1,N,dim)
+    return [X_train,fnn]
+
+
+def norm2Linear(lim1,N,dim=3):
     a = -lim1
     b = lim1
     (A,y_single) = readA_y(dim)
@@ -28,11 +39,10 @@ def constructData(lim1,N,dim=3):
     fnn = np.transpose(np.linalg.norm(Temp,axis=0)**2)
     fnn=np.squeeze(fnn)
 
-    X_train = np.squeeze(np.transpose(Temp))
+    #X_train = np.squeeze(np.transpose(Temp))
     return [X_train,fnn]
 
-def constructDataWithConstraints(lim1,N,dim=3):
-
+def norm2Constriaints(lim1,N,dim=3):
     a = -lim1
     b = lim1
     (A,y_single) = readA_y(dim)
@@ -103,6 +113,19 @@ def constructDataMAE(lim1,N):
     X_train = np.squeeze(np.transpose(X))
     return [X_train,fnn]
 
+def nonconvex_absolute(lim1,N,dim=3):
+    (a,y)=read_a_y(dim)
+
+
+    Y = np.ones((N, 1)) * y
+    X_mean = np.zeros((1,dim))
+    X=lim1*np.random.rand(N,dim)-lim1/2
+
+    fnn=(y-abs(np.dot(X,a)))**2
+    fnn=np.squeeze(fnn)
+
+    X_train = np.squeeze(X)
+    return [X_train,fnn]
 
 def addInput(center_3d):
     #add = np.vstack([center1 * center1, center2 * center2, center3 * center3, center1 * center2, center1 * center3, center2 * center3])
@@ -142,7 +165,8 @@ def gradientDescent(opt_echos,A,y,start_point,encoder,model,lr):
         #x_pre[np.where(x_pre<0)]=0
     return trace
 
-def gradientDescentWithConstraint(opt_echos,A,y,start_point,encoder,model,lr):
+def gradientDescentWithConstraint(opt_echos,start_point,encoder,model,lr):
+    (A,y)=readA_y(config.dim)
     trace = np.empty((opt_echos, 3))
     x_pre=start_point
     for i in range(opt_echos):
@@ -165,6 +189,30 @@ def gradientDescentWithConstraint(opt_echos,A,y,start_point,encoder,model,lr):
          #   trace = np.delete(trace, range(i + 1, opt_echos), 0)
          #   break
     return trace
+
+def GDabs(opt_echos,start_point,encoder,model,lr):
+    (a,y)=read_a_y(config.dim)
+    trace = np.empty((opt_echos, 3))
+    x_pre = start_point
+    for i in range(opt_echos):
+        # x_list.append(x_pre)
+
+        x_input = addInput(x_pre)
+        z_pos = encoder.predict(x_input)
+        y_output = model.predict(x_input)
+        if config.dim==2:
+            z_pos=x_input
+        print(i, 'constraint_path', np.transpose(x_pre))
+        trace[i, :] = (np.concatenate((z_pos, y_output), axis=1))
+
+        # descent
+        temp = np.dot(np.transpose(a), x_pre)
+        # MSE
+        temp2 = x_pre
+        x_pre = x_pre - 2 * lr * (abs(temp)-y)*temp/abs(temp)*a
+
+    return trace
+
 def getKey(a):
     return a[1]
 def getMinima(X_train,fnn):

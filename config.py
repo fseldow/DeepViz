@@ -1,2 +1,4 @@
 #declare some global parameters
-dim=5
+dim=4
+MAX_INT_TIME=10
+#def targetFunctionDict(targetFunction):

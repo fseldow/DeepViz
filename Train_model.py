@@ -7,8 +7,6 @@ from keras.models import Model,optimizers,Sequential
 from keras.layers import Dense, Input,BatchNormalization,Dropout,ActivityRegularization,LeakyReLU
 from keras.callbacks import EarlyStopping
 from buildData import constructData
-from buildData import constructDataWithConstraints
-from buildData import constructDataMAE
 from mpl_toolkits.mplot3d import Axes3D
 import os
 import config
@@ -23,14 +21,14 @@ epochs=50
 #randomly generate points between lim and -lim
 
 
-[X_train,fnn]=constructDataWithConstraints(lim1,N,dim=dim)
+[X_train,fnn]=constructData(lim1,N,dim=dim)
 #[X_train,fnn]=constructDataMAE(10,N)
 
 
 
 #build model
 input = Input(shape=(X_train.shape[1],))
-hidden1=LeakyReLU(alpha=-1000)(input)
+hidden1=Dense(600,activation='relu')(input)
 hidden2=Dense(600,activation='relu')(hidden1)
 hidden3=Dense(500,activation='relu')(hidden2)
 hidden4=Dense(2,activation='relu')(hidden3)
