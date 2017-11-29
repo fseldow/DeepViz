@@ -138,7 +138,8 @@ def addInput(center_3d):
 
 
 
-def gradientDescent(opt_echos,A,y,start_point,encoder,model,lr):
+def gradientDescent(opt_echos,start_point,encoder,model,lr):
+    (A,y)=readA_y(config.dim)
     trace = np.empty((opt_echos, 3))
     x_pre=start_point
     for i in range(opt_echos):

@@ -18,14 +18,13 @@ import config
 dim=config.dim
 step=0.1
 
-opt_echos=1000
+opt_echos=100
 N_test=10000
 
 (A,y) = readA_y(dim)
 #trace=np.empty((opt_echos,3))
 x_list=[]
 x_pre=20*np.random.rand(dim,1)
-x_pre=[[20],[20]]
 
 encoder=load_model('my_encoder_3.h5')
 decoder=load_model('my_decoder_3.h5')
@@ -40,14 +39,14 @@ z_start=[[-30],[-30]]
 print('starting point',x_pre)
 
 
-trace=gradientDescent(opt_echos,A,y,x_pre,encoder,model,step)
+trace=gradientDescent(opt_echos,x_pre,encoder,model,step)
 
 
 x_trace=np.asarray(trace[:,0])
 y_trace=np.asarray(trace[:,1])
 z_trace=np.log10(np.asarray(trace[:,2])+1)
 
-step=1
+step=0.1
 trace2=GDabs(opt_echos,x_pre,encoder,model,step)
 
 
@@ -77,7 +76,7 @@ Y_test=np.log10(decoder.predict(Z)+1)
 
 if dim==2:
     [Z,Y_test]=constructData(max(max(z1_scale,z2_scale),20),N_test,dim)
-    Y_test=np.log10(Y_test+1)
+    #Y_test=np.log10(Y_test+1)
 #############################################################################
 #plot
 if dim!=2:
