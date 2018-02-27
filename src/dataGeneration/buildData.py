@@ -3,7 +3,7 @@ import config
 MAX_INT=10
 def readA_y(dim):
     """load parameter for Matrix A and vector y"""
-    outfile = './dim_parameter/A_Y_para_'+str(dim)+'.npz'
+    outfile = config.dim_dir+'A_Y_para_'+str(dim)+'.npz'
     npzfile = np.load(outfile)
     A=npzfile['arr_0']
     y=npzfile['arr_1']
@@ -11,7 +11,7 @@ def readA_y(dim):
 
 def read_a_y(dim):
     """load parameters for vector a and variable y"""
-    outfile = './dim_parameter/ay_para_'+str(dim)+'.npz'
+    outfile = config.dim_dir +'ay_para_'+str(dim)+'.npz'
     npzfile = np.load(outfile)
     a=npzfile['arr_0']
     y=npzfile['arr_1']

@@ -57,9 +57,9 @@ callback = [
 ]
 model.fit(X_train, fnn, epochs=epochs, verbose=1,callbacks=callback)
 
-model.save('my_model_3.h5')
-encoder.save('my_encoder_3.h5')
-decoder.save('my_decoder_3.h5')
+model.save(config.module_dir+'my_model_3.h5')
+encoder.save(config.module_dir+'my_encoder_3.h5')
+decoder.save(config.module_dir+'my_decoder_3.h5')
 #calculate minimum point
 
 '''

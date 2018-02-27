@@ -3,6 +3,8 @@ from src.dataGeneration.buildData import addInput
 from src.dataGeneration.buildData import readA_y
 import matplotlib.pyplot as plt
 import matplotlib.tri as tr
+from mpl_toolkits.mplot3d import axes3d, Axes3D
+
 from keras.models import load_model
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' #disable tensorflow warnings
@@ -24,10 +26,10 @@ N_test=10000
 x_list=[]
 x_pre=20*np.random.rand(dim,1)
 
-encoder=load_model('my_encoder_3.h5')
-decoder=load_model('my_decoder_3.h5')
-model=load_model('my_model_3.h5')
-real_decoder=load_model('real_decoder_3.h5')
+encoder=load_model(config.module_dir+'my_encoder_3.h5')
+decoder=load_model(config.module_dir+'my_decoder_3.h5')
+model=load_model(config.module_dir+'my_model_3.h5')
+real_decoder=load_model(config.module_dir+'real_decoder_3.h5')
 
 
 
@@ -79,7 +81,7 @@ if dim==2:
 #plot
 if dim!=2:
     fig = plt.figure(1)
-    ax = fig.gca(projection='3d')
+    ax = Axes3D(fig)
     surf = ax.plot_trisurf(np.asarray(Z[:,0]),np.asarray(Z[:,1]),np.squeeze(Y_test),cmap='coolwarm',linewidth=0.2, antialiased=False)
     ax.plot(x_trace,y_trace,z_trace,c='r')
     ax.scatter(x_trace,y_trace,z_trace,c='g')
