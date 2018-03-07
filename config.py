@@ -1,7 +1,7 @@
 import os
 
 #declare some global parameters
-dim=4
+dim=10
 MAX_INT_TIME=10
 #def targetFunctionDict(targetFunction):
 project_dir = os.path.dirname(os.path.abspath(__file__))+'/'

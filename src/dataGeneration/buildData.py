@@ -44,7 +44,7 @@ def norm2Linear(lim1,N,dim=3):
     fnn=np.squeeze(fnn)
 
     #X_train = np.squeeze(np.transpose(Temp))
-    return [X_train,fnn]
+    return [X_train,fnn,X_mean]
 
 def norm2Constriaints(lim1,N,dim=3):
     """function of norm2 with constriants x>=0"""
@@ -79,7 +79,7 @@ def norm2Constriaints(lim1,N,dim=3):
     #fnn=np.squeeze(fnn)
     print('minima_point',getMinima(X_train,fnn))
     #X_train = np.squeeze(np.transpose(Temp))
-    return [X_train,fnn]
+    return [X_train,fnn,getMinima(X_train,fnn)]
 
 def constructDataMAE(lim1,N):
     """function of norm 1"""
@@ -123,7 +123,6 @@ def nonconvex_absolute(lim1,N,dim=3):
     """function: fnn=|| y-|ax| ||2"""
     (a,y)=read_a_y(dim)
 
-
     Y = np.ones((N, 1)) * y
     X_mean = np.zeros((1,dim))
     X=lim1*np.random.rand(N,dim)-lim1/2
@@ -132,7 +131,25 @@ def nonconvex_absolute(lim1,N,dim=3):
     fnn=np.squeeze(fnn)
 
     X_train = np.squeeze(X)
-    return [X_train,fnn]
+    X_min=getMinima(X_train,fnn)
+    return [X_train,fnn,X_min]
+
+def nonconvex_matrix_absolute(lim1,N,dim=3):
+    """function: fnn=|| y-|Ax| ||2"""
+    (A,Y)=readA_y(dim)
+
+
+    X = lim1 * np.random.rand(dim, N) - lim1 / 2
+
+    X_train = np.squeeze(np.transpose(X))
+
+    Temp = Y - np.dot(A, X)
+    fnn = np.transpose(np.linalg.norm(Temp, axis=0) ** 2)
+    fnn = np.squeeze(fnn)
+
+
+    X_min=getMinima(X_train,fnn)
+    return [X_train,fnn,X_min]
 
 def addInput(center_3d):
     """change a single row value to data structure which could be trained or predicted"""
