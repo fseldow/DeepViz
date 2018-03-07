@@ -163,19 +163,30 @@ def addInput(center_3d):
 
 
 
-def gradientDescent(opt_echos,start_point,encoder,model,lr):
+def gradientDescent(opt_echos,start_point,encoder=0,model=0,lr=0):
     """gradient descent trace of norm2"""
     (A,y)=readA_y(config.dim)
-    trace = np.empty((opt_echos, 3))
+
     x_pre=start_point
+    trace = np.empty((opt_echos,config.dim + 1))
+    if encoder!=0:
+        trace = np.empty((opt_echos, 3))
+
     for i in range(opt_echos):
 
         # x_list.append(x_pre)
-        x_input = addInput(x_pre)
-        z_pos = encoder.predict(x_input)
-        y_output = model.predict(x_input)
-        print(i, 'normal_path', np.transpose(x_pre))
-        trace[i, :] = (np.concatenate((z_pos, y_output), axis=1))
+        if encoder==0:
+            trace[i, 0:-1] = np.transpose(x_pre);
+            Y = np.ones((config.dim, 1)) * y
+            Temp = Y - np.dot(A, x_pre)
+            fnn_temp = np.transpose(np.linalg.norm(Temp) ** 2)
+            trace[i, -1] = fnn_temp
+        else:
+            x_input = addInput(x_pre)
+            z_pos = encoder.predict(x_input)
+            y_output = model.predict(x_input)
+            print(i, 'normal_path', np.transpose(x_pre))
+            trace[i, :] = (np.concatenate((z_pos, y_output), axis=1))
 
         #descent
         temp = np.dot(A, x_pre) - y
