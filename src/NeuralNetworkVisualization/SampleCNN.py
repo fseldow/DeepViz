@@ -6,6 +6,7 @@ from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.utils import np_utils as u
 from keras.datasets import cifar10
 
+
 import config
 
 epochs = 25
@@ -51,14 +52,14 @@ model.add(Dropout(0.3))
 model.add(Dense(10, activation='softmax'))
 #Few simple configurations
 model.compile(loss='categorical_crossentropy',
-              optimizer=SGD(momentum=0.5, decay=0.0004, metrics=['accuracy']))
+              optimizer=SGD(momentum=0.5, decay=0.0004), metrics=['accuracy'])
 #Run the algorithm!
 for i in range(epochs):
     model.fit(X, y, validation_data=(X_test, y_test), epochs=1,
               batch_size=512)
-    model.save_weights(config.module_dir + "CNN1/" + "cifar10_"+i+".hdf5")
+    model.save_weights(config.module_dir + "CNN2/" + "cifar10_"+str(i)+".hdf5")
 #Save the weights to use for later
-model.save_weights(config.module_dir + "CNN1/" + "cifar10_final.hdf5")
+model.save_weights(config.module_dir + "CNN2/" + "cifar10_final.hdf5")
 #Finally print the accuracy of our model!
 print("Accuracy: &2.f%%" %(model.evaluate(X_test, y_test)[1]*100))
 #print(model.predict_classes(X[0:1]))
