@@ -13,21 +13,21 @@ def projection(x, minima, d1, d2):
     b = x-minima
     A = np.concatenate([d1,d2],axis=1)
     At = np.transpose(A)
-    AA = np.dot(At, A)
+    AA = np.matmul(At, A)
     AA_inverse = np.linalg.inv(AA)
-    ret = np.dot(AA_inverse, np.dot(At, b))
+    ret = np.matmul(AA_inverse, np.dot(At, b))
     return ret
 
 lim1=20#limit the range of values
 N=20000 #number of points in the train set
 
 
-[X,fnn,min_pos]=bd.norm2Linear(lim1,N,dim=dim)
+[X,fnn,min_pos]=bd.nonconvex_matrix_absolute(lim1,N,dim=dim)
 
 #find another minima point
 echo = 100
 lr = 0.1
-start_point = 100*np.random.rand(dim,1)-15
+start_point = 100* np.random.rand(dim,1)-15
 trace = bd.gradientDescent(opt_echos= echo, start_point = start_point, lr = lr)
 
 minima2 = np.transpose(np.asmatrix(trace[-1, 0:-1]))
@@ -66,7 +66,7 @@ x = range(-100,100)
 y = range(-100,100)
 Map = np.ones([40000,2])
 fnn=[]
-for i in x:`
+for i in x:
     for j in y:
         #i/=20.0
         #j/=20.0

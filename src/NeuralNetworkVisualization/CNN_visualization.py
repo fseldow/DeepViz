@@ -10,25 +10,58 @@ from keras.datasets import cifar10
 import config
 
 def convertWeightFormat(model):
+    """convert a multi-layer model weights into a single array with shape(N,)"""
     weights = model.get_weights()
-    ret = list()
+    ret = []
     for weight in weights:
         ret += list(np.reshape(weight,weight.size))
     return np.asarray(tuple(ret))
 
+def convertList2LayoutWeight(parameter, model):
+    """convert a array with shape (N,) to multi layer weights"""
+    ret = []
+    weights_format = model.get_weights()
+    end=0
+    start=0
+    for format in weights_format:
+        end += format.size
+        p = parameter[start:end]
+        temp = np.reshape(p, format.shape)
+        ret.append(temp)
+        start=end
+    return ret
+
 def projection(x, minima, d1, d2):
+    """Project a point x onto space determined by d1, d2"""
     x = np.reshape(x, minima.shape)
     minima = np.asarray(minima)
     b = x-minima
-    A = np.concatenate([d1,d2],axis=1)
+    A = np.ones((len(d1),2))
+    A[:,0]=d1
+    A[:,1]=d2
+    #A = np.concatenate([d1,d2],axis=1)
     At = np.transpose(A)
     AA = np.dot(At, A)
     AA_inverse = np.linalg.inv(AA)
     ret = np.dot(AA_inverse, np.dot(At, b))
     return ret
 
+def convertOthrographic(d1, d2):
+    """adjust d2 to make d1 othrographic to d2
+        usage: d2= convertOthrographic(d1,d2)
+    """
+    d1 = np.transpose(np.asarray(d1))
+    d2 = np.transpose(np.asarray(d2))
+    temp = np.inner(d1, d1)
+
+    d2 = d1 - (np.inner(d1, d1) / np.inner(d2, d1)) * d2
+
+    return d2
 
 
+
+###########################################################################################
+#Now we can go ahead and create our Convolution model
 model = Sequential()
 #We want to output 32 features maps. The kernel size is going to be
 #3x3 and we specify our input shape to be 32x32 with 3 channels
@@ -57,20 +90,52 @@ model.add(Dense(10, activation='softmax'))
 #Few simple configurations
 model.compile(loss='categorical_crossentropy',
               optimizer=SGD(momentum=0.5, decay=0.0004), metrics=['accuracy'])
-
+##################################################################################################
 
 model.load_weights(config.module_dir + "CNN1/cifar10_final.hdf5")
-test = convertWeightFormat(model)
+minima1 = convertWeightFormat(model)
 
-minima1 = np.ones(10,1)
-minima2 = np.ones(10,1)+np.ones(10,1)
-dim=10
+
+model.load_weights(config.module_dir + "CNN2/cifar10_final.hdf5")
+minima2 = convertWeightFormat(model)
+
+dim = len(minima1)
 d1 = minima2-minima1
-d2 = np.asmatrix(np.random.rand(dim, 1)-0.5)
+d2 = np.random.rand(dim)-0.5
+d2 = convertOthrographic(d1, d2)
 
-d1 = np.transpose(np.asarray(d1))
-d2 = np.transpose(np.asarray(d2))
+"""
+trace1 = []
+trace2 = []
+for i in range(25):
+    model.load_weights(config.module_dir + "CNN1/cifar10_"+str(i)+".hdf5")
+    trace1.append(convertWeightFormat(model))
+
+    model.load_weights(config.module_dir + "CNN2/cifar10_" + str(i) + ".hdf5")
+    trace2.append(convertWeightFormat(model))
+
+trace_map1 = []
+trace_map2 = []
+for i in range(25):
+    trace_map1.append(projection(trace1[i], minima1, d1, d2))
+    trace_map2.append(projection(trace2[i], minima1, d1, d2))
+"""
+
+x_range = range(-100,100)
+y_range = range(-100,100)
+Ground = np.asarray([[i,j] for i in x_range for j in y_range])
+#Lets start by loading the Cifar10 data
+
+(X, y), (X_test, y_test) = cifar10.load_data()
+fnn=[]
+for pos in Ground:
+    p = minima1 + pos[0] * d1 + pos[1] * d2
+    weight = convertList2LayoutWeight(p, model)
+    #model.set_weights(weight)
+    model.load_weights(config.module_dir + "CNN2/cifar10_final.hdf5")
+    print(model.evaluate(X_test, y_test)[1] )
+    fnn.append(1)
+print(Ground)
 
 
-d2 = d1 - (np.inner(d1, d1)[0,0] / np.inner(d2, d1)[0,0]) * d2
-print("d1.d2",np.inner(d1,d2))
+

@@ -29,17 +29,14 @@ def norm2Linear(lim1,N,dim=3):
     b = lim1
     (A,y_single) = readA_y(dim)
     A_inv=np.linalg.inv(A)
-
     Y = np.ones((dim, N)) * y_single
-
-    X_mean=np.dot(A_inv,np.asarray(y_single))
+    X_mean=np.matmul(A_inv,np.asarray(y_single))
 
     print('should min',X_mean)
-
     X = lim1 * np.random.rand(dim, N) - lim1 / 2 + X_mean
     X_train = np.squeeze(np.transpose(X))
 
-    Temp =Y- np.dot(A, X)
+    Temp =Y- np.matmul(A, X)
     fnn = np.transpose(np.linalg.norm(Temp,axis=0)**2)
     fnn=np.squeeze(fnn)
 
@@ -52,9 +49,7 @@ def norm2Constriaints(lim1,N,dim=3):
     b = lim1
     (A,y_single) = readA_y(dim)
     A_inv=np.linalg.inv(A)
-
     Y = np.ones((dim, N)) * y_single
-
 
     X_mean=np.dot(A_inv,np.asarray(y_single))
     print('should min', X_mean)
@@ -92,7 +87,7 @@ def constructDataMAE(lim1,N):
     y3 = np.ones((1, N)) * 5
     y = np.concatenate((y1, y2, y3))
 
-    X_mean=np.dot(A_inv,np.asarray(y[:,0]))
+    X_mean=np.matmul(A_inv,np.asarray(y[:,0]))
 
     #X_mean=np.dot(np.inv(A),y)
     X1 = np.random.normal(X_mean[0], 10, (1,N))
@@ -127,7 +122,7 @@ def nonconvex_absolute(lim1,N,dim=3):
     X_mean = np.zeros((1,dim))
     X=lim1*np.random.rand(N,dim)-lim1/2
 
-    fnn=(y-abs(np.dot(X,a)))**2
+    fnn=(y-abs(np.matmul(X,a)))**2
     fnn=np.squeeze(fnn)
 
     X_train = np.squeeze(X)
@@ -137,19 +132,28 @@ def nonconvex_absolute(lim1,N,dim=3):
 def nonconvex_matrix_absolute(lim1,N,dim=3):
     """function: fnn=|| y-|Ax| ||2"""
     (A,Y)=readA_y(dim)
-
-
     X = lim1 * np.random.rand(dim, N) - lim1 / 2
-
     X_train = np.squeeze(np.transpose(X))
 
-    Temp = Y - np.dot(A, X)
+    Temp = Y - np.matmul(A, X)
     fnn = np.transpose(np.linalg.norm(Temp, axis=0) ** 2)
     fnn = np.squeeze(fnn)
 
 
     X_min=getMinima(X_train,fnn)
     return [X_train,fnn,X_min]
+
+def gradientDescentAbsMatrix(opt_echos,start_point,lr):
+    (A, Y)= readA_y(config.dim)
+
+    x_pre = start_point
+    trace = np.empty((opt_echos,config.dim + 1))
+    for i in range(opt_echos):
+        trace[i, 0:-1] = np.transpose(x_pre);
+        Y = np.ones((config.dim, 1)) * y
+        Temp = Y - np.matmul(A, x_pre)
+        fnn_temp = np.transpose(np.linalg.norm(Temp) ** 2)
+        trace[i, -1] = fnn_temp
 
 def addInput(center_3d):
     """change a single row value to data structure which could be trained or predicted"""
@@ -178,7 +182,7 @@ def gradientDescent(opt_echos,start_point,encoder=0,model=0,lr=0):
         if encoder==0:
             trace[i, 0:-1] = np.transpose(x_pre);
             Y = np.ones((config.dim, 1)) * y
-            Temp = Y - np.dot(A, x_pre)
+            Temp = Y - np.matmul(A, x_pre)
             fnn_temp = np.transpose(np.linalg.norm(Temp) ** 2)
             trace[i, -1] = fnn_temp
         else:
@@ -189,9 +193,9 @@ def gradientDescent(opt_echos,start_point,encoder=0,model=0,lr=0):
             trace[i, :] = (np.concatenate((z_pos, y_output), axis=1))
 
         #descent
-        temp = np.dot(A, x_pre) - y
+        temp = np.matmul(A, x_pre) - y
         # MSE
-        temp2 = x_pre - 2 * lr * np.dot(np.transpose(A), temp)
+        temp2 = x_pre - 2 * lr * np.matmul(np.transpose(A), temp)
         #if np.linalg.norm(temp2-x_pre)<lr*0.01:
         #    trace=np.delete(trace,range(i+1,opt_echos),0)
          #   break
@@ -218,10 +222,10 @@ def gradientDescentWithConstraint(opt_echos,start_point,encoder,model,lr):
         trace[i, :] = (np.concatenate((z_pos, y_output), axis=1))
 
         #descent
-        temp = np.dot(A, x_pre) - y
+        temp = np.matmul(A, x_pre) - y
         # MSE
         temp2=x_pre
-        x_pre = x_pre - 2 * lr * np.dot(np.transpose(A), temp)
+        x_pre = x_pre - 2 * lr * np.matmul(np.transpose(A), temp)
         #constraints
         x_pre[np.where(x_pre<0)]=0
         #if np.linalg.norm(temp2-x_pre)<lr*0.01:
