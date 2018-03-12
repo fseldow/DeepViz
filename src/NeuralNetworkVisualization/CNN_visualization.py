@@ -127,13 +127,14 @@ Ground = np.asarray([[i,j] for i in x_range for j in y_range])
 #Lets start by loading the Cifar10 data
 
 (X, y), (X_test, y_test) = cifar10.load_data()
+y, y_test = u.to_categorical(y, 10), u.to_categorical(y_test, 10)
 fnn=[]
 for pos in Ground:
     p = minima1 + pos[0] * d1 + pos[1] * d2
     weight = convertList2LayoutWeight(p, model)
-    #model.set_weights(weight)
-    model.load_weights(config.module_dir + "CNN2/cifar10_final.hdf5")
-    print(model.evaluate(X_test, y_test)[1] )
+    model.set_weights(weight)
+    #model.load_weights(config.module_dir + "CNN2/cifar10_final.hdf5")
+    print(model.evaluate(X, y)[1] )
     fnn.append(1)
 print(Ground)
 

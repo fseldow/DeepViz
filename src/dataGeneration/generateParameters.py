@@ -16,6 +16,8 @@ def generateA(dim=3):
         #Y=generateY(dim)
         min=10*np.random.rand(dim,1)-5
         Y=np.dot(A,min)
+        Y=generateY(dim)
+        return (A,Y)
         pos=np.where(min<0)
         if len(pos[0])==0 or len(pos[0])==dim:
             (A, Y) = generateA(dim)
@@ -24,7 +26,7 @@ def generateA(dim=3):
     return (A,Y)
 
 def generateY(dim=3):
-    Y=30*np.random.rand(dim,1)-5
+    Y=30*np.random.rand(dim,1)
     return Y
 
 ############################################

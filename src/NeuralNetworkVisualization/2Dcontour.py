@@ -5,12 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tr
 from mpl_toolkits.mplot3d import axes3d, Axes3D
+import math
 
 dim=config.dim
 def projection(x, minima, d1, d2):
     x = np.reshape(x, minima.shape)
     minima = np.asarray(minima)
-    b = x-minima
+    b = np.reshape(x-minima, (dim,1))
     A = np.concatenate([d1,d2],axis=1)
     At = np.transpose(A)
     AA = np.matmul(At, A)
@@ -25,15 +26,23 @@ N=20000 #number of points in the train set
 [X,fnn,min_pos]=bd.nonconvex_matrix_absolute(lim1,N,dim=dim)
 
 #find another minima point
-echo = 100
-lr = 0.1
-start_point = 100* np.random.rand(dim,1)-15
-trace = bd.gradientDescent(opt_echos= echo, start_point = start_point, lr = lr)
+echo = 1000000
+lr = 0.001
+start_point = 10* np.random.rand(dim,1)-15
+trace = bd.gradientDescentAbsMatrix(opt_echos= echo, start_point = start_point, lr = lr)
 
-minima2 = np.transpose(np.asmatrix(trace[-1, 0:-1]))
+(A, Y)=bd.readA_y(dim)
+minima1 = np.matmul(np.linalg.inv(A),Y)
+minima2 = np.matmul(np.linalg.inv(A),-Y)
 
-d1 = minima2 - min_pos
-d1 = np.asmatrix(np.random.rand(dim, 1)-0.5)
+min_pos=minima1
+
+print("minima1", np.transpose(minima1))
+print("minima2", np.transpose(minima2))
+print("gd result", trace[-1,0:-1])
+
+d1 = (minima2 - minima1)/50
+#d1 = np.asmatrix(np.random.rand(dim, 1)-0.5)
 d2 = np.asmatrix(np.random.rand(dim, 1)-0.5)
 
 d1 = np.transpose(np.asarray(d1))
@@ -62,22 +71,21 @@ cov = np.identity(dim)
 
 [d1,d2,d] = np.random.multivariate_normal(mean, cov, 3)
 """
-x = range(-100,100)
-y = range(-100,100)
-Map = np.ones([40000,2])
+x = range(-30,100)
+y = range(-10,10)
+Map = np.asarray([[i,j/5]for i in x for j in y])
 fnn=[]
-for i in x:
-    for j in y:
-        #i/=20.0
-        #j/=20.0
-        (A, y_single) = bd.readA_y(dim)
-        Y = np.ones((dim, 1)) * y_single
-        Map[(i+100)*200+j+100,0]=i
-        Map[(i+100)*200+j+100,1]=j
-        X_temp = min_pos + i*d1 + j*d2
-        Temp = Y - np.dot(A, X_temp)
-        fnn_temp = np.transpose(np.linalg.norm(Temp)**2)
-        fnn.append(fnn_temp)
+for pos in Map:
+    i=pos[0]
+    j=pos[1]
+    (A, y_single) = bd.readA_y(dim)
+    Y = np.ones((dim, 1)) * y_single
+
+    X_temp = min_pos + i*d1 + j*d2
+    Temp = Y - abs(np.matmul(A, X_temp))
+    fnn_temp = np.transpose(np.linalg.norm(Temp)**2)
+    fnn_temp = math.log(fnn_temp+1)
+    fnn.append(fnn_temp)
 
 Map = np.asarray(Map)
 print(Map.shape)

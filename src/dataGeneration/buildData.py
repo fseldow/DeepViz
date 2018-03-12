@@ -135,7 +135,7 @@ def nonconvex_matrix_absolute(lim1,N,dim=3):
     X = lim1 * np.random.rand(dim, N) - lim1 / 2
     X_train = np.squeeze(np.transpose(X))
 
-    Temp = Y - np.matmul(A, X)
+    Temp = Y - abs(np.matmul(A, X))
     fnn = np.transpose(np.linalg.norm(Temp, axis=0) ** 2)
     fnn = np.squeeze(fnn)
 
@@ -144,16 +144,28 @@ def nonconvex_matrix_absolute(lim1,N,dim=3):
     return [X_train,fnn,X_min]
 
 def gradientDescentAbsMatrix(opt_echos,start_point,lr):
-    (A, Y)= readA_y(config.dim)
+    (A, y)= readA_y(config.dim)
 
     x_pre = start_point
     trace = np.empty((opt_echos,config.dim + 1))
     for i in range(opt_echos):
         trace[i, 0:-1] = np.transpose(x_pre);
         Y = np.ones((config.dim, 1)) * y
-        Temp = Y - np.matmul(A, x_pre)
+        Temp = Y - abs(np.matmul(A, x_pre))
         fnn_temp = np.transpose(np.linalg.norm(Temp) ** 2)
         trace[i, -1] = fnn_temp
+
+        print(""+str(i), fnn_temp)
+
+        temp = abs(np.matmul(A, x_pre)) - y
+        temp2 = np.matmul(A, x_pre)/abs(np.matmul(A, x_pre))*np.identity(config.dim)
+        # if np.linalg.norm(temp2-x_pre)<lr*0.01:
+        #    trace=np.delete(trace,range(i+1,opt_echos),0)
+        #   break
+        # else:
+
+        x_pre = x_pre - 2 * lr * np.matmul(np.matmul(np.transpose(A), temp2), temp)
+    return trace
 
 def addInput(center_3d):
     """change a single row value to data structure which could be trained or predicted"""
