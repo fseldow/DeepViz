@@ -15,8 +15,9 @@ def generateA(dim=3):
         A_inv=np.linalg.inv(A)
         #Y=generateY(dim)
         min=10*np.random.rand(dim,1)-5
-        Y=np.dot(A,min)
-        Y=generateY(dim)
+        Y=abs(np.dot(A,min))
+        #Y=generateY(dim)
+
         return (A,Y)
         pos=np.where(min<0)
         if len(pos[0])==0 or len(pos[0])==dim:

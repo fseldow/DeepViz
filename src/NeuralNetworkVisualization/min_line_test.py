@@ -193,13 +193,15 @@ def xy_to_alpha_beta(x, x_min, u, v):
    # return alpha,beta
    return var3[0],var3[1]
 
-if __name__ == "__main__":
-   func2plot = None
+if True:
+   func2plot = "2"
    fixed = False
    threed = False
    # get command line arguments
+   """
    try:
       func2plot = sys.argv[1]
+      func2plot = 2
    except:
       pass
    try:
@@ -216,7 +218,7 @@ if __name__ == "__main__":
          threed = True
    except:
       pass
-
+   """
 
    # plot with new seed everytime enter is pressed
    while True:
@@ -270,7 +272,7 @@ if __name__ == "__main__":
       
       
       plt.show(block=False)
-      wait = input("PRESS ENTER TO CONTINUE.")
+
       if input()=='q':
          break
 

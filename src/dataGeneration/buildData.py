@@ -157,14 +157,22 @@ def gradientDescentAbsMatrix(opt_echos,start_point,lr):
 
         print(""+str(i), fnn_temp)
 
+        df = np.zeros(config.dim)
+        for j in range(config.dim):
+            t1 = -2 * (y[j] - abs(np.dot(A[j, :], x_pre)))
+            t2 = (np.dot(A[j, :], x_pre) / abs(np.dot(A[j, :], x_pre))) * A[j, :]
+            df = df + t1 * t2
+        x_pre = x_pre - lr*np.reshape(df, x_pre.shape)
+        """
         temp = abs(np.matmul(A, x_pre)) - y
-        temp2 = np.matmul(A, x_pre)/abs(np.matmul(A, x_pre))*np.identity(config.dim)
+        temp2 = np.matmul(A, x_pre)/abs(np.matmul(A, x_pre)) * np.identity(config.dim)
         # if np.linalg.norm(temp2-x_pre)<lr*0.01:
         #    trace=np.delete(trace,range(i+1,opt_echos),0)
         #   break
         # else:
 
         x_pre = x_pre - 2 * lr * np.matmul(np.matmul(np.transpose(A), temp2), temp)
+        """
     return trace
 
 def addInput(center_3d):
