@@ -166,11 +166,6 @@ def gradientDescentAbsMatrix(opt_echos,start_point,lr):
         """
         temp = abs(np.matmul(A, x_pre)) - y
         temp2 = np.matmul(A, x_pre)/abs(np.matmul(A, x_pre)) * np.identity(config.dim)
-        # if np.linalg.norm(temp2-x_pre)<lr*0.01:
-        #    trace=np.delete(trace,range(i+1,opt_echos),0)
-        #   break
-        # else:
-
         x_pre = x_pre - 2 * lr * np.matmul(np.matmul(np.transpose(A), temp2), temp)
         """
     return trace

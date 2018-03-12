@@ -134,6 +134,7 @@ for pos in Ground:
     weight = convertList2LayoutWeight(p, model)
     model.set_weights(weight)
     #model.load_weights(config.module_dir + "CNN2/cifar10_final.hdf5")
+    temp = model.evaluate(X, y)
     print(model.evaluate(X, y)[1] )
     fnn.append(1)
 print(Ground)
