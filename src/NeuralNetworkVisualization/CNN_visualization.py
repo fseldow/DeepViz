@@ -127,6 +127,7 @@ Ground = np.asarray([[i,j] for i in x_range for j in y_range])
 #Lets start by loading the Cifar10 data
 
 (X, y), (X_test, y_test) = cifar10.load_data()
+X, X_test = X.astype('float32')/255.0, X_test.astype('float32')/255.0
 y, y_test = u.to_categorical(y, 10), u.to_categorical(y_test, 10)
 fnn=[]
 for pos in Ground:
