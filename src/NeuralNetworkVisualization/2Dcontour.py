@@ -10,6 +10,7 @@ import matplotlib.animation as animation
 from matplotlib.animation import FuncAnimation
 import sys
 import time
+import pandas as pd
 
 
 
@@ -57,6 +58,7 @@ def convertOthrographic(d1, d2):
     d2 = d1 - (np.inner(d1, d1) / np.inner(d2, d1)) * d2
 
     return d2
+
 
 lim1=20#limit the range of values
 N=20000 #number of points in the train set
@@ -162,6 +164,16 @@ for f in range(40):
     #plt.set_xlim([min(min(Z1)),max(max(Z1))])
     #plt.set_ylim([min(min(Z2)),max(max(Z2))])
     plt.title("rotate "+"%.2f" % theta)#set title
+
+    if f==0:
+        surface = np.reshape(fnn, (len(y),len(x)))
+        np.savetxt("surface.csv", surface, delimiter=",",fmt='%10.5f')
+        axisInf =[]
+        xInf=[min(x),max(x),len(x),(max(x)-min(x))/(len(x)-1)]
+        yInf=[min(y),max(y),len(y),(max(y)-min(y))/(len(y)-1)]
+        axisInf.append(xInf)
+        axisInf.append(yInf)
+        np.savetxt("AxisSetting.csv",np.asarray(axisInf),delimiter=',',fmt='%10.5f')
 
 
     #plt.show()
