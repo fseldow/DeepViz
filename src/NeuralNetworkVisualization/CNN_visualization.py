@@ -130,14 +130,20 @@ Ground = np.asarray([[i,j] for i in x_range for j in y_range])
 X, X_test = X.astype('float32')/255.0, X_test.astype('float32')/255.0
 y, y_test = u.to_categorical(y, 10), u.to_categorical(y_test, 10)
 fnn=[]
+
+N=50
+X=X[0:N]
+y=y[0:N]
+
 for pos in Ground:
     p = minima1 + pos[0] * d1 + pos[1] * d2
     weight = convertList2LayoutWeight(p, model)
     model.set_weights(weight)
     #model.load_weights(config.module_dir + "CNN2/cifar10_final.hdf5")
-    print(model.evaluate(X, y)[1] )
-    fnn.append(1)
-print(Ground)
+    ret = model.evaluate(X, y)[1];
+    print(ret)
+    fnn.append(ret)
+print(fnn)
 
 
 
