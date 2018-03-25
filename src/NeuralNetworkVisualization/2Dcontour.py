@@ -66,21 +66,37 @@ N=20000 #number of points in the train set
 (A, Y)=bd.readA_y(dim)
 minima1 = np.matmul(np.linalg.inv(A),Y)
 minima2 = np.matmul(np.linalg.inv(A),-Y)
+min_pos=minima1
+d1 = (minima2 - minima1)/50
+#d1 = np.asmatrix(np.random.rand(dim, 1)-0.5)
+d2 = np.asmatrix(np.random.rand(dim, 1)-0.5)
 
+d1 = np.transpose(np.asarray(d1))
+d2 = np.transpose(np.asarray(d2))
+
+
+d2 = d1 - (np.inner(d1, d1)[0,0] / np.inner(d2, d1)[0,0]) * d2
+print("d1.d2",np.inner(d1,d2))
+
+d1 = np.transpose(np.asarray(d1))
+d2 = np.transpose(np.asarray(d2))
 
 
 #find another minima point
 echo = 100000
-lr = 0.01
-start_point = 15* np.random.rand(dim,1)-2 + minima1
+lr = 0.0001
+start_point = minima1 + d1*15 + d2*5
 trace = bd.gradientDescentAbsMatrix(opt_echos= echo, start_point = start_point, lr = lr)
+print(start_point)
+print(trace[0,0:-1])
 
 
-min_pos=minima1
+
 
 print("minima1", np.transpose(minima1))
 print("minima2", np.transpose(minima2))
 print("gd result", trace[-1,0:-1])
+
 
 d1 = (minima2 - minima1)
 #d1 = np.asmatrix(np.random.rand(dim, 1)-0.5)
