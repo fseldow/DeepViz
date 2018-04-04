@@ -19,7 +19,7 @@ def read_a_y(dim):
 
 def constructData(lim1,N,dim=3):
     """construct data required to train or test"""
-    [X_train, fnn]=nonconvex_absolute(lim1,N,dim)
+    [X_train, fnn]=norm2Linear(lim1,N,dim)
     return [X_train,fnn]
 
 
@@ -32,7 +32,7 @@ def norm2Linear(lim1,N,dim=3):
     Y = np.ones((dim, N)) * y_single
     X_mean=np.matmul(A_inv,np.asarray(y_single))
 
-    print('should min',X_mean)
+    print('should min',np.transpose(X_mean))
     X = lim1 * np.random.rand(dim, N) - lim1 / 2 + X_mean
     X_train = np.squeeze(np.transpose(X))
 
@@ -41,7 +41,7 @@ def norm2Linear(lim1,N,dim=3):
     fnn=np.squeeze(fnn)
 
     #X_train = np.squeeze(np.transpose(Temp))
-    return [X_train,fnn,X_mean]
+    return [X_train,fnn]
 
 def norm2Constriaints(lim1,N,dim=3):
     """function of norm2 with constriants x>=0"""

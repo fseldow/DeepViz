@@ -1,8 +1,10 @@
 import os
 
 #declare some global parameters
-dim=5
-MAX_INT_TIME=10
+dim = 5
+MAX_INT_TIME = 10
+Epoch_visual = 25
+
 #def targetFunctionDict(targetFunction):
 project_dir = os.path.dirname(os.path.abspath(__file__))+'/'
 

@@ -128,8 +128,15 @@ for f in range(40):
     #print(path)
 
     x = range(-30,100)
-    y = range(-10,10)
-    Map = np.asarray([[i/50,j/500]for i in x for j in y])
+    y = range(-20,20)
+    lim_x = [-0.6, 2]
+    lim_y = [-0.2, 0.2]
+    precise = 200
+
+    x = np.linspace(lim_x[0], lim_x[1], precise)
+    y = np.linspace(lim_y[0], lim_y[1], precise)
+
+    Map = np.asarray([[i,j]for i in x for j in y])
     fnn=[]
     for pos in Map:
         i=pos[0]
@@ -147,8 +154,8 @@ for f in range(40):
     print(Map.shape)
 
 
-    fig = plt.figure(1)
-    ax = Axes3D(fig)
+    fig1 = plt.figure(1)
+    ax = Axes3D(fig1)
     surf = ax.plot_trisurf(np.asarray(Map[:,0]),np.asarray(Map[:,1]),np.squeeze(fnn),cmap='coolwarm',linewidth=0.2, antialiased=False)
     plt.colorbar(surf)
 
@@ -179,6 +186,7 @@ for f in range(40):
     #plt.show()
     #time.sleep(5)
     fig.savefig(str(f)+".png")
+    fig1.savefig(str(f)+'_3d.png')
     fig.clear()
 
 
