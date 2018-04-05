@@ -44,8 +44,8 @@ def projection(x, minima, d1, d2):
     minima = np.asarray(minima)
     b = x-minima
     A = np.ones((len(d1),2))
-    A[:,0]=d1
-    A[:,1]=d2
+    A[:,0]=np.squeeze(d1)
+    A[:,1]=np.squeeze(d2)
     #A = np.concatenate([d1,d2],axis=1)
     At = np.transpose(A)
     AA = np.dot(At, A)
@@ -100,17 +100,17 @@ W = np.dot(w, np.transpose(w))
 eig_v, eig_d = np.linalg.eig(W)
 index_sort = sorted(range(len(eig_v)), key=lambda k: eig_v[k], reverse = True)
 
-d1 = eig_d[:, index_sort[0]]
-d21 = eig_d[:, index_sort[1]]
-d22 = eig_d[:, index_sort[2]]
+d1 = np.real(eig_d[:, index_sort[0]])
+d21 = np.real(eig_d[:, index_sort[1]])
+d22 = np.real(eig_d[:, index_sort[2]])
 
 """
 d1 = np.random.rand(dim)-0.5
 d2 = np.random.rand(dim)-0.5
 d2 = convertOthrographic(d1, d2)
 """
-lim_alpha = [-2, 2]
-lim_beta = [-2, 2]
+lim_alpha = [-3, 7]
+lim_beta = [-5, 5]
 precise = 50
 
 alpha_range = np.linspace(lim_alpha[0], lim_alpha[1], precise)
@@ -127,6 +127,16 @@ for f in range(nFrame):
     print('degree %.2f'%degree)
 
     d2 = d21 * math.cos(degree) + d22 * math.sin(degree)
+
+    trace = np.empty((config.Epoch_visual, dim))
+    for i in range(config.Epoch_visual):
+        model.load_weights(config.module_dir + "SimpleNN/weights_%d.hdf5"%i)
+        trace[i,:] = convertWeightFormat(model)
+
+    path = np.empty((config.Epoch_visual,2))
+    for i in range(config.Epoch_visual):
+        x_path = np.transpose(trace[i,:])
+        path[i,:] = np.transpose(projection(x_path, minima1, d1, d2))
 
     fnn = [None] * precise * precise
     count = 0
@@ -148,8 +158,8 @@ for f in range(nFrame):
     surf = plt.tricontourf(triang,np.squeeze(fnn),np.arange(3, 7, 0.5))#draw contour colors
     plt.colorbar()#draw colorbar
     surf2 = plt.tricontour(triang,np.squeeze(fnn),np.arange(3, 7, 0.5))#draw contour lines
-    #line = plt.plot(np.asarray(path[:,0]),np.asarray(path[:,1]),c='r')
-    #plt.plot(np.asarray(path[-1,0]),np.asarray(path[-1,1]),marker='x')
+    line = plt.plot(np.asarray(path[:,0]),np.asarray(path[:,1]),c='r')
+    plt.plot(np.asarray(path[-1,0]),np.asarray(path[-1,1]),marker='x',c='y')
     #plt.set_xlim([min(min(Z1)),max(max(Z1))])
     #plt.set_ylim([min(min(Z2)),max(max(Z2))])
     plt.title("rotate "+"%.2f" % degree)#set title
