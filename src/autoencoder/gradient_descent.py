@@ -1,6 +1,6 @@
 import numpy as np
-from src.dataGeneration.buildData import addInput
-from src.dataGeneration.buildData import readA_y
+from src.Utils.buildData import addInput
+from src.Utils.buildData import readA_y
 import matplotlib.pyplot as plt
 import matplotlib.tri as tr
 from mpl_toolkits.mplot3d import axes3d, Axes3D
@@ -8,9 +8,9 @@ from mpl_toolkits.mplot3d import axes3d, Axes3D
 from keras.models import load_model
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' #disable tensorflow warnings
-from src.dataGeneration.buildData import constructData
-from src.dataGeneration.buildData import gradientDescent
-from src.dataGeneration.buildData import GDabs
+from src.Utils.buildData import constructData
+from src.Utils.buildData import gradientDescent
+from src.Utils.buildData import GDabs
 #import Train_model
 import config
 

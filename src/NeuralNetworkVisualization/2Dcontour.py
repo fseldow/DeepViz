@@ -1,4 +1,4 @@
-import src.dataGeneration.buildData as bd
+import src.Utils.buildData as bd
 
 import config
 import numpy as np

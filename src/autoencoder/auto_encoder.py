@@ -2,7 +2,7 @@ from keras.models import load_model,Sequential
 from keras.layers import Dense
 from keras.callbacks import EarlyStopping
 import config
-from src.dataGeneration import buildData as bd
+from src.Utils import buildData as bd
 
 N=16000
 lim=100

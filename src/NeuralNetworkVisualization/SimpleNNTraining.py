@@ -1,6 +1,6 @@
 import config
 import numpy as np
-from src.dataGeneration.buildData import constructData
+from src.Utils.buildData import constructData
 from keras.models import Model,optimizers
 from keras.models import Sequential
 from keras.layers import Dense, Input,BatchNormalization

@@ -6,7 +6,7 @@ import matplotlib.tri as tr
 from keras.models import Model
 from keras.layers import Dense, Input
 from keras.callbacks import EarlyStopping
-from src.dataGeneration.buildData import constructData
+from src.Utils.buildData import constructData
 
 # Encoder
 lim1=10#limit the range of values

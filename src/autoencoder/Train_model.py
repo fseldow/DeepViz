@@ -3,7 +3,7 @@ from __future__ import print_function
 from keras.models import Model,optimizers
 from keras.layers import Dense, Input,BatchNormalization
 from keras.callbacks import EarlyStopping
-from src.dataGeneration.buildData import constructData
+from src.Utils.buildData import constructData
 import config
 
 dim=config.dim
