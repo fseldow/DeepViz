@@ -19,6 +19,12 @@ from mpl_toolkits.mplot3d import axes3d, Axes3D
 import config
 from src.Utils.utils import savePlane
 
+def normalization(d, model):
+    weights = convertList2LayoutWeight(d, model)
+    for weight in weights:
+        weight /= np.linalg.norm(weight)
+    model.set_weights(weights)
+    return convertWeightFormat(model)
 
 def convertWeightFormat(model):
     """convert a multi-layer model weights into a single array with shape(N,)"""
@@ -73,8 +79,8 @@ def convertOthrographic(d1, d2):
 num_classes = 10
 img_rows, img_cols = 28, 28
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
-x_train = x_train[0:5000]
-y_train = y_train[0:5000]
+x_train = x_train[0:50]
+y_train = y_train[0:50]
 if K.image_data_format() == 'channels_first':
     x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
     x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
@@ -97,15 +103,15 @@ y_test = keras.utils.to_categorical(y_test, num_classes)
 ###########################################################################################
 # reconstruct network
 model = Sequential()
-model.add(Conv2D(32, kernel_size=(3, 3),
+model.add(Conv2D(6, kernel_size=(3, 3),
                  activation='relu',
                  input_shape=input_shape))
-model.add(Conv2D(64, (3, 3), activation='relu'))
+#model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 model.add(Flatten())
-model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
+#model.add(Dense(5, activation='relu'))
+#model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
@@ -116,10 +122,6 @@ model.compile(loss=keras.losses.categorical_crossentropy,
 model.load_weights(config.module_dir + "MNIST/weights_%d.hdf5"%(config.Epoch_visual-1))
 minima1 = convertWeightFormat(model)
 
-
-model.load_weights(config.module_dir + "MNIST/weights_%d.hdf5"%(config.Epoch_visual-1))
-minima2 = convertWeightFormat(model)
-
 # create W - W0 through the gradient descent path
 dim = len(minima1)
 w = np.empty((dim, config.Epoch_visual - 1))
@@ -129,6 +131,7 @@ for epoch in range(config.Epoch_visual - 1):
     w[:, epoch] = weight - minima1
 
 # calculate the most three represented direction
+"""
 W = np.dot(w, np.transpose(w))
 eig_v, eig_d = np.linalg.eig(W)
 index_sort = sorted(range(len(eig_v)), key=lambda k: eig_v[k], reverse = True)
@@ -137,14 +140,24 @@ d1 = np.real(eig_d[:, index_sort[0]])
 d21 = np.real(eig_d[:, index_sort[1]])
 d22 = np.real(eig_d[:, index_sort[2]])
 
+np.save('MNIST', [d1,d21,d22])
 """
-d1 = np.random.rand(dim)-0.5
+d = np.load('MNIST.npy')
+d1 = np.squeeze(d[0,:])
+d21 = np.squeeze(d[1,:])
+d22 = np.squeeze(d[2,:])
+
+d1 = normalization(d1, model)
+d21 = normalization(d21, model)
+d22 = normalization(d22, model)
+"""
+d1 = 
 d2 = np.random.rand(dim)-0.5
 d2 = convertOthrographic(d1, d2)
 """
-lim_alpha = [-3, 7]
-lim_beta = [-5, 5]
-precise = 50
+lim_alpha = [-50, 50]
+lim_beta = [-50, 50]
+precise = 100
 
 alpha_range = np.linspace(lim_alpha[0], lim_alpha[1], precise)
 beta_range = np.linspace(lim_beta[0], lim_beta[1], precise)
@@ -153,6 +166,10 @@ beta_range = np.linspace(lim_beta[0], lim_beta[1], precise)
 Ground = np.asarray([[i,j] for i in alpha_range for j in beta_range])
 
 nFrame = 40
+
+min_cost = 3
+max_cost = 7
+
 for f in range(nFrame):
 
     start_time = time.time()
@@ -181,24 +198,29 @@ for f in range(nFrame):
         ret = model.evaluate(x_train, y_train, verbose = 0)
         #print(time.time()-start_time)
         #print(ret)
-        fnn[count] = math.log(ret + 1)
+        fnn[count] = math.log(ret[0] + 1)
         count += 1
-    #print('time cost %.2f'% (time.time() - start_time))
+    print('time cost %.2f'% (time.time() - start_time))
     #print(fnn)
+
+    if f==0:
+        max_cost = math.ceil(max(fnn)) + 1
+        min_cost = math.floor(min(fnn)) - 1
+        level = (max_cost - min_cost) / 20
 
     fig = plt.figure(1)
     triang=tr.Triangulation(np.asarray(Ground[:,0]),np.asarray(Ground[:,1]))
-    surf = plt.tricontourf(triang,np.squeeze(fnn),np.arange(3, 7, 0.5))#draw contour colors
+    surf = plt.tricontourf(triang,np.squeeze(fnn),np.arange(min_cost, max_cost, level))#draw contour colors
     plt.colorbar()#draw colorbar
-    surf2 = plt.tricontour(triang,np.squeeze(fnn),np.arange(3, 7, 0.5))#draw contour lines
+    surf2 = plt.tricontour(triang,np.squeeze(fnn),np.arange(min_cost, max_cost, level))#draw contour lines
     line = plt.plot(np.asarray(path[:,0]),np.asarray(path[:,1]),c='r')
     plt.plot(np.asarray(path[-1,0]),np.asarray(path[-1,1]),marker='x',c='y')
     #plt.set_xlim([min(min(Z1)),max(max(Z1))])
     #plt.set_ylim([min(min(Z2)),max(max(Z2))])
     plt.title("rotate "+"%.2f" % degree)#set title
-    fig.savefig(config.data_dir + 'result/rotation/frame%d.png'%f)
+    fig.savefig(config.data_dir + 'result/rotation_MNIST/frame%d.png'%f)
     fig.clear()
     #plt.show()
 
     # store data:
-    savePlane(config.data_dir + 'MNIST/', alpha= alpha_range, beta=beta_range, loss=fnn, name='surface_rotation_%.2f' % degree)
+    savePlane(config.data_dir + 'result/rotation_MNIST/', alpha= alpha_range, beta=beta_range, loss=fnn, name='surface_rotation_%.2f.csv' % degree)

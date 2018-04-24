@@ -3,7 +3,7 @@ import os
 #declare some global parameters
 dim = 5
 MAX_INT_TIME = 10
-Epoch_visual = 25
+Epoch_visual = 100
 
 #def targetFunctionDict(targetFunction):
 project_dir = os.path.dirname(os.path.abspath(__file__))+'/'
