@@ -128,6 +128,9 @@ for epoch in range(config.Epoch_visual - 1):
     weight = convertWeightFormat(model)
     w[:, epoch] = weight - minima1
 
+test = np.linalg.svd(w)
+print(test)
+
 # calculate the most three represented direction
 W = np.dot(w, np.transpose(w))
 eig_v, eig_d = np.linalg.eig(W)
